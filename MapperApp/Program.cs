@@ -13,8 +13,18 @@ namespace MapperApp
     {
         static void Main(string[] args)
         {
-            List<Type> allClassesTypes = new List<Type>();
             var dbOperations = new DatabaseOperations();
+
+            Console.WriteLine("Test pobrania kolumn z tabeli Users:");
+            var columns = dbOperations.GetObjectColumnNamesFromDatabase(typeof(Users));
+            foreach (var col in columns)
+            {
+                Console.WriteLine(col);
+            }
+            Console.WriteLine("---- KONIEC TESTU ----");
+            Console.ReadLine();
+
+            List<Type> allClassesTypes = new List<Type>();
             var objectPropertiesGetter = new ObjectPropertiesGetter();
 
             //utworzenie schematów translacji
