@@ -1,39 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EntityFrameworkLib
 {
     public class DatabaseOperations : IDatabaseOperations
     {
-        /*
-         Założenia: ta klasa korzysta z DatabaseContext do komunikacji z bazą danych
+        private readonly string _connectionString =
+            "Server=localhost;Database=PullSystem_NEW;Trusted_Connection=True;TrustServerCertificate=True;";
 
-        Na podstawie nazwy typu klasy w metodzie GetObjectColumnNamesFromDatabase zakładając, że nazwa typu klasy jest taka jak tabeli w 
-        bazie danych pobierasz listę która zawiera nazwy kolumn tej tabeli i ją zwracasz. Może się zdarzyć, że dla klasy której szukasz
-        nazwa tabeli jest nieco inna przykład:
+        public List<string> GetObjectColumnNamesFromDatabase(Type type)
+        {
+            // 1) Normalize name of the class (remove non-letters, lower-case)
+            string desired = HelperOperations
+                .RemoveAllCharsExceptLetters(type.Name)
+                .ToLower();
 
-        StandConfig => Stand_Config w bazie
+            List<string> allTables = new List<string>();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
 
-        taką sytuację też trzeba obsłużyć dlatego
+                // 2) Pobierz wszystkie tabele
+                using (var cmd = new SqlCommand(
+                    "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE'", conn))
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                        allTables.Add(rdr.GetString(0));
+                }
 
-        Porównaj nazwy klasy oraz tabeli w bazie danych używając rozszerzeń
-        Rozszerzenia powinny znajdować się w klasie HelperOperations
-        Porównując nazwy skonwertuj napisy na małe litery, usuń wszystko po za literami z napisu i następnie porównaj w ten sposób:
-        
-        ....
-        string napis = "Ala$";
-        string napis2 = "Ala";
-        napis.RemoveAllCharsExceptLetters();
-        if(napis.StringIsEqualTo(napis2))
-        .....
+                // 3) Znajdź właściwą tabelę po znormalizowanej nazwie
+                string found = allTables
+                    .FirstOrDefault(tbl =>
+                        HelperOperations.RemoveAllCharsExceptLetters(tbl)
+                            .ToLower() == desired);
 
-        Jeżeli nie znajdziesz tabeli o takiej nazwie jak nazwa klasy:
-            -za pomocą klasy FileLogger dodajesz komunikat o błędzie do pliku tekstowego
-            -zwracasz pustą listę stringów
-         */
-        public List<string> GetObjectColumnNamesFromDatabase(Type type) => throw new NotImplementedException();
+                if (found == null)
+                {
+                    FileLogger.LogError($"Brak tabeli odpowiadającej klasie: {type.Name}");
+                    return new List<string>();
+                }
+
+                // 4) Pobierz kolumny tej tabeli
+                var columns = new List<string>();
+                using (var cmd = new SqlCommand(
+                    "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=@t", conn))
+                {
+                    cmd.Parameters.AddWithValue("@t", found);
+                    using (var rdr = cmd.ExecuteReader())
+                        while (rdr.Read())
+                            columns.Add(rdr.GetString(0));
+                }
+
+                return columns;
+            }
+        }
     }
 }
