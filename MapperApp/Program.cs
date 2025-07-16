@@ -4,6 +4,8 @@ using ObjectsLib.Models;
 using System;
 using System.Collections.Generic;
 using TranslationManagerLib;
+using LibPull.Objects.EntityFrameworkCore;
+
 
 namespace MapperApp
 {
@@ -12,7 +14,7 @@ namespace MapperApp
         static void Main(string[] args)
         {
             var options = new DbContextOptionsBuilder<DatabaseContext>()
-                .UseSqlServer("Server=localhost;Database=LocalMapper;Trusted_Connection=True;TrustServerCertificate=True;")
+                .UseSqlServer("Server=localhost;Database=PullSystem_NEW;Trusted_Connection=True;TrustServerCertificate=True;")
                 .Options;
 
             using (var context = new DatabaseContext(options))
@@ -22,8 +24,9 @@ namespace MapperApp
 
                 List<Type> allClassesTypes = new List<Type>
                 {
-                    typeof(Users),
-                    typeof(StandConfig)
+                    typeof(StandConfig),
+                    typeof(PullOrder),
+                    typeof(WorkOrder)
                 };
 
                 foreach (var type in allClassesTypes)
@@ -35,24 +38,10 @@ namespace MapperApp
                     Console.WriteLine($"Schemat translacji dla {type.Name} {(success ? "został utworzony" : "nie został utworzony")}");
                 }
 
-                var translationUsers = TranslationManager.GetTranslation<Users>();
-                if (translationUsers != null)
-                {
-                    Console.WriteLine("Schemat translacji dla Users:");
-                    foreach (var kvp in translationUsers)
-                    {
-                        PrintMappingWithDiff(kvp.Key, kvp.Value);
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Brak schematu translacji dla Users.");
-                }
-
                 var translationStandConfig = TranslationManager.GetTranslation<StandConfig>();
                 if (translationStandConfig != null)
                 {
-                    Console.WriteLine("Schemat translacji dla StandConfig:");
+                    Console.WriteLine("\nSchemat translacji dla StandConfig:");
                     foreach (var kvp in translationStandConfig)
                     {
                         PrintMappingWithDiff(kvp.Key, kvp.Value);
@@ -60,10 +49,38 @@ namespace MapperApp
                 }
                 else
                 {
-                    Console.WriteLine("Brak schematu translacji dla StandConfig.");
+                    Console.WriteLine("\nBrak schematu translacji dla StandConfig.");
                 }
 
-                Console.WriteLine("---- KONIEC TESTU ----");
+                var translationPullOrder = TranslationManager.GetTranslation<PullOrder>();
+                if (translationPullOrder != null)
+                {
+                    Console.WriteLine("\nSchemat translacji dla PullOrder:");
+                    foreach (var kvp in translationPullOrder)
+                    {
+                        PrintMappingWithDiff(kvp.Key, kvp.Value);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\nBrak schematu translacji dla PullOrder.");
+                }
+
+                var translationWorkOrder = TranslationManager.GetTranslation<WorkOrder>();
+                if (translationWorkOrder != null)
+                {
+                    Console.WriteLine("\nSchemat translacji dla WorkOrder :");
+                    foreach (var kvp in translationWorkOrder)
+                    {
+                        PrintMappingWithDiff(kvp.Key, kvp.Value);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\nBrak schematu translacji dla WorkOrder .");
+                }
+
+                Console.WriteLine("\n---- KONIEC TESTU ----");
                 Console.ReadLine();
             }
         }

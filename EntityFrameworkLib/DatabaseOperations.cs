@@ -8,7 +8,7 @@ namespace EntityFrameworkLib
     public class DatabaseOperations : IDatabaseOperations
     {
         private readonly string _connectionString =
-            "Server=localhost;Database=LocalMapper;Trusted_Connection=True;TrustServerCertificate=True;";
+            "Server=localhost;Database=PullSystem_NEW;Trusted_Connection=True;TrustServerCertificate=True;";
 
         public List<string> GetObjectColumnNamesFromDatabase(Type type)
         {
