@@ -131,6 +131,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EntityFrameworkLib\EntityFrameworkLib.csproj">
+      <Project>{852d29c6-44d3-44b8-a17b-9c71afb01c15}</Project>
+      <Name>EntityFrameworkLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ObjectsLib\ObjectsLib.csproj">
       <Project>{0E5AE909-3F4D-42A5-96DA-316164CBFB40}</Project>
       <Name>ObjectsLib</Name>

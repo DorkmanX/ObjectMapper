@@ -9,8 +9,8 @@ namespace ObjectsLib.Models
     public class StandConfig
     {
         public int ID { get; set; }
-        public int PlaceId { get; set; }
-        public string ModelId { get; set; }
+        public int PlaceID { get; set; }
+        public string ModelID { get; set; }
         public bool IsActive { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EntityFrameworkLib;
 
 namespace TranslationManagerLib
 {
@@ -11,7 +12,7 @@ namespace TranslationManagerLib
     {
         private static Dictionary<Type, Dictionary<string, string>> _translations = new Dictionary<Type, Dictionary<string, string>>();
 
-        public static bool CreateAndAddTranslationScheme(Type type,List<string> objectProperties,List<string> databaseColumns)
+        public static bool CreateAndAddTranslationScheme(Type type, List<string> objectProperties, List<string> databaseColumns)
         {
             if (type == null || objectProperties == null || databaseColumns == null)
                 return false;
@@ -20,7 +21,9 @@ namespace TranslationManagerLib
 
             foreach (var prop in objectProperties)
             {
-                var matchedColumn = databaseColumns.FirstOrDefault(col => col.Equals(prop, StringComparison.OrdinalIgnoreCase));
+                var matchedColumn = databaseColumns.FirstOrDefault(col =>
+                    col.RemoveAllCharsExceptLetters().StringIsEqualTo(prop.RemoveAllCharsExceptLetters())
+                );
 
                 if (!string.IsNullOrEmpty(matchedColumn))
                 {
@@ -28,15 +31,18 @@ namespace TranslationManagerLib
                 }
             }
 
+
             if (_translations.ContainsKey(type))
             {
                 _translations[type] = translation;
-            }            else
+            }
+            else
             {
                 _translations.Add(type, translation);
             }
             return true;
         }
+
         public static Dictionary<string,string> GetTranslation<T>() where T : class
         {
             var type = typeof(T);

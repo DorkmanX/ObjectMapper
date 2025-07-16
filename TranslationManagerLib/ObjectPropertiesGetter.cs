@@ -5,19 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 
+
 namespace TranslationManagerLib
 {
     public class ObjectPropertiesGetter : IObjectPropertiesGetter
     {
         public List<string> GetObjectsPropertiesWithReflection(Type type)
         {
-            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            var propertyNames = new List<string>();
+            if (type == null) return new List<string>();
 
-            foreach(var prop in properties)
-            {
-                propertyNames.Add(prop.Name);
-            }
+            var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var propertyNames = properties.Select(p => p.Name).ToList();
 
             return propertyNames;
         }

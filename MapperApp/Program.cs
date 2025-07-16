@@ -17,7 +17,7 @@ namespace MapperApp
 
             using (var context = new DatabaseContext(options))
             {
-                var dbOperations = new DatabaseOperations(context);
+                var dbOperations = new DatabaseOperations();
                 var objectPropertiesGetter = new ObjectPropertiesGetter();
 
                 List<Type> allClassesTypes = new List<Type>
@@ -41,7 +41,7 @@ namespace MapperApp
                     Console.WriteLine("Schemat translacji dla Users:");
                     foreach (var kvp in translationUsers)
                     {
-                        Console.WriteLine($"{kvp.Key} -> {kvp.Value}");
+                        PrintMappingWithDiff(kvp.Key, kvp.Value);
                     }
                 }
                 else
@@ -55,16 +55,41 @@ namespace MapperApp
                     Console.WriteLine("Schemat translacji dla StandConfig:");
                     foreach (var kvp in translationStandConfig)
                     {
-                        Console.WriteLine($"{kvp.Key} -> {kvp.Value}");
+                        PrintMappingWithDiff(kvp.Key, kvp.Value);
                     }
                 }
                 else
                 {
                     Console.WriteLine("Brak schematu translacji dla StandConfig.");
                 }
+
                 Console.WriteLine("---- KONIEC TESTU ----");
                 Console.ReadLine();
             }
+        }
+
+        private static void PrintMappingWithDiff(string prop, string col)
+        {
+            Console.Write($"{prop} -> {col}");
+
+            if (!prop.Equals(col, StringComparison.Ordinal))
+            {
+                var diffs = new List<string>();
+                int max = Math.Max(prop.Length, col.Length);
+                for (int i = 0; i < max; i++)
+                {
+                    char c1 = i < prop.Length ? prop[i] : '∅';
+                    char c2 = i < col.Length ? col[i] : '∅';
+                    if (c1 != c2)
+                        diffs.Add($"[{i + 1}: '{c1}'→'{c2}']");
+                }
+                if (diffs.Count > 0)
+                {
+                    Console.Write("   Różnice: " + string.Join(" ", diffs));
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 }
